@@ -93,7 +93,7 @@ void initialize_2D_buffer (unsigned int mem_array [], unsigned int *fill_value)
         // Faster method of filling array
         // The for loops are interchanged
         // Array IS filled in consecutive memory address order
-        /**********************************
+        
         for (int j = 0; j < mem_array_j_max; j++)
         {
                 for (int i = 0; i < mem_array_i_max; i++)
@@ -101,9 +101,9 @@ void initialize_2D_buffer (unsigned int mem_array [], unsigned int *fill_value)
                         mem_array [j*mem_array_j_max+i] = *fill_value + 2;
                 }
         }
-        /***********************************
+        
 }
-*****************************************************************/
+
 
 
 static color_t render_one_pixel (int x, int y, unsigned int *local_mbox, unsigned int &serial,
