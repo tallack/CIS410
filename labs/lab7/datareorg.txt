@@ -1,1 +1,9 @@
-This should be replaced by a description of the data reorganization you chose to implement and its effectiveness. Your description can be short, but should address the change made and why you expected a performance improvement. You should also include performance metrics to support wether runtime improved or not.
+I really only made a few changes to the code. 
+
+REORGANIZATION
+I transposed matrix B (Bt). 
+
+MODIFCICATION TO ALGORITHM
+-I changed the multiply algorithm so when it multiplies two matrices it can multiply straight across each of them (that is, it multiplies across each row, then moves down to the next row and multiplies across that one.. and so on). This speeds up the program because now the algorithm doesnt have to jump from row to row (array to array) every multiplication.
+-I then parallelized the nested for loops to decrease the time it takes to make these computations.
+
