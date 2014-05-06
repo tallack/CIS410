@@ -92,14 +92,17 @@ void stencil(const int rows, const int cols, pixel * const in, pixel * const out
 	double kernelx[dim*dim];
 	double kernely[dim*dim];
 
+	prewittX_kernel(3,3,kernelx);
+	prewittY_kernel(3,3,kernely);
+
 	#pragma omp parallel for
-	for(int i=0; i<rows; i++){
-		for(int j=0; j<cols; j++){
+	for(int i=0; i<rows; ++i){
+		for(int j=0; j<cols; ++j){
 			const int k= i+(j*rows);
 
 			double pixelX=0;
 			double pixelY=0;
-			for(int x=i-rad, kx=0; x<=j+rad; x++, ++kx){
+			for(int x=i-rad, kx=0; x<=i+rad; ++x, ++kx){
 				for(int y=j-rad, ky=0; y<=j+rad; ++y, ++ky){
 					const int in_off=x+(y*rows);
 					const int k_off=kx+(ky*dim);
@@ -110,7 +113,7 @@ void stencil(const int rows, const int cols, pixel * const in, pixel * const out
 				}
 			}
 
-			double root=sqrt(pixelX+pixelX+pixelY*pixelY);
+			double root=sqrt(pixelX*pixelX+pixelY*pixelY);
 			out[k].red=root;
 			out[k].green=root;
 			out[k].blue=root;
@@ -188,19 +191,20 @@ int main( int argc, char* argv[] ) {
 	// Create output array for prewitt_stencil
 	         pixel * outPixels_second = (pixel *) malloc(rows * cols * sizeof(pixel));
 	                 for(int i = 0; i < rows * cols; ++i) {
-	                                 outPixels_second[i].red = 0.0;
-	                                                 outPixels_second[i].green = 0.0;
-	                                                                 outPixels_second[i].blue = 0.0;
+	                         outPixels_second[i].red = 0.0;
+	                         outPixels_second[i].green = 0.0;
+	                         outPixels_second[i].blue = 0.0;
 	                                                                         
 			  }
 
 	// Do the stencil
-	apply_stencil(3, 32.0, rows, cols, imagePixels, outPixels);
+	apply_stencil(3, 32.0, rows, cols, imagePixels, outPixels_second);
 	stencil(rows, cols, outPixels_second, outPixels);
 
 	
 	// Create an output image (same size as input)
 	Mat dest(rows, cols, CV_8UC3);
+	//outPixels=outPixels_second;
 	// Copy C array back into image for output
 	for(int i = 0; i < rows; ++i) {
 		for(int j = 0; j < cols; ++j) {

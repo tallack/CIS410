@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <tbb/tbb.h>
 
 using namespace cv;
 
@@ -86,7 +87,10 @@ void apply_stencil(const int radius, const double stddev, const int rows, const 
 	const int dim = radius*2+1;
 	double kernel[dim*dim];
 	gaussian_kernel(dim, dim, stddev, kernel);
-	for(int i = 0; i < rows; ++i) {
+	
+	tbb::parallel_for(
+	tbb::blocked_range<int>(0,rows),[=](tbb::blocked_range<int> r){
+	   for(int i=r.begin(); i !=r.end(); ++i){
 		for(int j = 0; j < cols; ++j) {
 			const int out_offset = i + (j*rows);
 			// For each pixel, do the stencil
@@ -102,7 +106,8 @@ void apply_stencil(const int radius, const double stddev, const int rows, const 
 				}
 			}
 		}
-	}
+	   }
+	});
 }
 
 int main( int argc, char* argv[] ) {
