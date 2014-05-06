@@ -56,8 +56,10 @@ void matrix_init(void) {
         //Make matrix D the transpose of matrix B 
 	for (i=0; i<M; i++){
 		for (j=0; j<P; j++){
-			D[i][j] = Bt[j][i];
+			Bt[i][j] = B[j][i];
+			printf("%f", Bt[i][j]);
 		}
+		//printf("/n");
 	}
 	
 }
