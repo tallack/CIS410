@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <opencv2/opencv.hpp>
-#inlcude <omp.h>
+#include <omp.h>
 
 using namespace cv;
 
@@ -28,7 +28,11 @@ static int sim_steps;
 int walker(long int seed, int x, int y, int stepsremaining) {
     struct drand48_data seedbuf;
     srand48_r(seed, &seedbuf);
-    int particles = 1;
+    int particles = 0;
+
+  #pragma omp single
+  {
+
     for( ; stepsremaining>0 ; stepsremaining-- ) {
         
         // Does the Carter particle split? If so, start the walk for the new one
@@ -36,18 +40,27 @@ int walker(long int seed, int x, int y, int stepsremaining) {
             //printf("spliting!\n");
             long int newseed;
             lrand48_r(&seedbuf, &newseed);
-            particles += walker(seed + newseed, x, y, stepsremaining-1);
-        }
+
+            #pragma omp task shared(particles) firstprivate(seedbuf, seed, x, y, stepsremaining)
+	    {
+	          particles += walker(seed + newseed, x, y, stepsremaining-1);
+	    }
+         }
+
+
         
         // Make the particle walk?
         updateLocation(&seedbuf, area, &x, &y, radius);
-    }
+     }
+  }
     
     // record the final location
     outArea[toOffset(x,y,radius)] += 1;
     
-    return particles;
+    return particles+1;
 }
+
+
 
 int main(int argc, char** argv) {
     if(argc<6 || ((argc-4)%2 != 0)) {
